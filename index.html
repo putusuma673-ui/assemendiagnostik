@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Diagnostik Tabung</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#dbeafe,#ccfbf1);
+  text-align: center;
+  padding: 20px;
+  color: #17324d;
+}
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 22px;
+  box-shadow: 0 5px 20px #0002;
+}
+h1 { color: #1765a5; }
+h2 { font-size: 23px; }
+button {
+  padding: 14px 22px;
+  margin: 8px;
+  border: none;
+  border-radius: 12px;
+  background: #1765a5;
+  color: white;
+  font-size: 17px;
+  cursor: pointer;
+}
+button:hover { background: #0e4778; }
+.option {
+  display: block;
+  width: 90%;
+  margin: 12px auto;
+  padding: 15px;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #17324d;
+  cursor: pointer;
+  font-size: 17px;
+}
+.option:hover { background: #dbeafe; }
+#feedback {
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  background: #ecfdf5;
+}
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🚀 GAME MISI TABUNG</h1>
+<h2>Asesmen Diagnostik Awal</h2>
+<p>Materi: Luas Permukaan Tabung</p>
+
+<div id="awal">
+<h2>Selamat Datang, Pejuang Matematika!</h2>
+<p>Jawablah 5 tantangan berikut untuk mengetahui kesiapan belajarmu.</p>
+<button onclick="mulai()">MULAI PERMAINAN</button>
+</div>
+
+<div id="game" class="hidden">
+<h3 id="nomor"></h3>
+<h2 id="soal"></h2>
+<div id="pilihan"></div>
+<div id="feedback" class="hidden"></div>
+<button id="lanjut" class="hidden"
+onclick="berikutnya()">LANJUT</button>
+</div>
+
+<div id="hasil" class="hidden">
+<h1>🎉 PERMAINAN SELESAI!</h1>
+<h2 id="skor"></h2>
+<h2 id="kategori"></h2>
+<p id="saran"></p>
+<button onclick="ulang()">ULANGI PERMAINAN</button>
+</div>
+
+</div>
+
+<script>
+const data = [
+{
+soal:"1. Diameter sebuah lingkaran adalah 14 cm. Berapakah jari-jarinya?",
+pilihan:["7 cm","14 cm","21 cm","28 cm"],
+jawaban:0,
+bahas:"Jari-jari = diameter ÷ 2 = 14 ÷ 2 = 7 cm."
+},
+{
+soal:"2. Rumus luas lingkaran adalah ...",
+pilihan:["2 × π × r","π × r²","π × d","4 × π × r"],
+jawaban:1,
+bahas:"Rumus luas lingkaran adalah L = π × r²."
+},
+{
+soal:"3. Sebuah lingkaran memiliki jari-jari 7 cm. Jika π = 22/7, luasnya adalah ...",
+pilihan:["44 cm²","77 cm²","154 cm²","308 cm²"],
+jawaban:2,
+bahas:"L = π × r² = 22/7 × 7 × 7 = 154 cm²."
+},
+{
+soal:"4. Sebuah persegi panjang memiliki panjang 12 cm dan lebar 5 cm. Luasnya adalah ...",
+pilihan:["17 cm²","34 cm²","60 cm²","120 cm²"],
+jawaban:2,
+bahas:"Luas persegi panjang = panjang × lebar = 12 × 5 = 60 cm²."
+},
+{
+soal:"5. Tabung tertutup memiliki bagian permukaan berupa ...",
+pilihan:[
+"Dua lingkaran dan satu selimut",
+"Satu lingkaran dan satu segitiga",
+"Dua segitiga dan satu persegi",
+"Tiga lingkaran"
+],
+jawaban:0,
+bahas:"Tabung tertutup terdiri dari alas lingkaran, tutup lingkaran, dan selimut tabung."
+}
+];
+
+let nomor = 0;
+let nilai = 0;
+let sudahMenjawab = false;
+
+function mulai() {
+ document.getElementById("awal").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ tampilSoal();
+}
+
+function tampilSoal() {
+ sudahMenjawab = false;
+ const q = data[nomor];
+ document.getElementById("nomor").innerText =
+ "Tantangan " + (nomor+1) + " dari 5";
+ document.getElementById("soal").innerText = q.soal;
+ document.getElementById("feedback").classList.add("hidden");
+ document.getElementById("lanjut").classList.add("hidden");
+
+ let html = "";
+ q.pilihan.forEach((p,i)=>{
+ html += `<button class="option" onclick="jawab(${i})">${String.fromCharCode(65+i)}. ${p}</button>`;
+ });
+ document.getElementById("pilihan").innerHTML = html;
+}
+
+function jawab(pilih) {
+ if(sudahMenjawab) return;
+ sudahMenjawab = true;
+
+ const q = data[nomor];
+ const benar = pilih === q.jawaban;
+
+ if(benar) nilai++;
+
+ const f = document.getElementById("feedback");
+ f.classList.remove("hidden");
+ f.innerHTML = benar
+ ? "✅ <b>BENAR!</b><br>" + q.bahas
+ : "❌ <b>Belum tepat.</b><br>Jawaban benar: " +
+ String.fromCharCode(65+q.jawaban) + ". " +
+ q.pilihan[q.jawaban] + "<br>" + q.bahas;
+
+ document.querySelectorAll(".option").forEach((b,i)=>{
+ b.disabled = true;
+ if(i===q.jawaban) b.style.background="#bbf7d0";
+ else if(i===pilih) b.style.background="#fecaca";
+ });
+
+ document.getElementById("lanjut").classList.remove("hidden");
+ document.getElementById("lanjut").innerText =
+ nomor === 4 ? "LIHAT HASIL" : "SOAL BERIKUTNYA";
+}
+
+function berikutnya() {
+ nomor++;
+ if(nomor < data.length) {
+ tampilSoal();
+ } else {
+ tampilHasil();
+ }
+}
+
+function tampilHasil() {
+ document.getElementById("game").classList.add("hidden");
+ document.getElementById("hasil").classList.remove("hidden");
+
+ document.getElementById("skor").innerText =
+ "Jawaban benar: " + nilai + " dari 5 soal";
+
+ let kategori, saran;
+
+ if(nilai >= 4) {
+ kategori = "🌟 SIAP BELAJAR";
+ saran = "Kamu sudah menguasai sebagian besar materi prasyarat. Siap mempelajari luas permukaan tabung!";
+ } else if(nilai >= 2) {
+ kategori = "👍 CUKUP SIAP";
+ saran = "Pelajari kembali rumus luas lingkaran dan luas persegi panjang.";
+ } else {
+ kategori = "💪 PERLU PENGUATAN";
+ saran = "Mari belajar kembali tentang jari-jari, diameter, luas lingkaran, dan luas persegi panjang.";
+ }
+
+ document.getElementById("kategori").innerText = kategori;
+ document.getElementById("saran").innerText = saran;
+}
+
+function ulang() {
+ nomor = 0;
+ nilai = 0;
+ document.getElementById("hasil").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ tampilSoal();
+}
+</script>
+</body>
+</html>
